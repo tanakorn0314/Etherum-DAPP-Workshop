@@ -30,8 +30,7 @@
 <body>
     <div class='container py-3'>
         <div class='d-flex justify-content-between'>
-            <a href='/tutorial2/'>&lt;&lt; Tutorial 2</a>
-            <a href='/tutorial4/'>Tutorial 4 >></a>
+            <a href='/tutorial3/'>&lt;&lt; Tutorial 3</a>
         </div>
 
         <div class='my-3'>
@@ -43,29 +42,27 @@
 
         <hr />
 
-        <h1>Share Example</h1>
+        <h1>Voting Example</h1>
 
         <div class='mb-3'>
-            <div id='share-list' class='row mb-4'></div>
+            <p id='status'></p>
+            <div id='proposals' class='row mb-2'></div>
+            <p id='voting-time'></p>
+            <p id='winner'></p>
+        </div>
 
-            <p>Pool balance: <span id='pool-balance'></span></p>
 
-            <div class="mb-3">
-                <p>Donate amount (ETH)</p>
-                <div class='d-flex w-25'>
-                    <input id='balance-input' class='form-control mr-1' type='number' />
-                    <button class='btn btn-primary' onclick="donate()">Donate</button>
-                </div>
+        <hr />
+
+        <h4>Manage Panel</h4>
+
+        <p>Chair person <span id='chairperson-address'></span></p>
+
+        <div id='managePanel'>
+            <div class='d-flex w-50'>
+                <input id='address-input' class='form-control mr-1' placeholder="User address" />
+                <button class='btn btn-primary' onclick="handleGiveRight()">Approve</button>
             </div>
-
-            <div id='withdraw-panel'>
-                <p>Withdraw amount (ETH)</p>
-                <div class='d-flex w-25'>
-                    <input id='withdraw-input' class='form-control mr-1' type='number' />
-                    <button class='btn btn-primary' onclick="handleWithdraw()">Withdraw</button>
-                </div>
-            </div>
-
         </div>
 
         <hr />
@@ -73,13 +70,6 @@
         <div class='mb-3'>
             <h4>Logs</h4>
             <ul id='logs'></ul>
-        </div>
-
-        <hr />
-
-        <div class='mb-3'>
-            <h4>History</h4>
-            <ul id='history'></ul>
         </div>
 
     </div>

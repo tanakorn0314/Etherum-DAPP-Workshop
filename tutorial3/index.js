@@ -5,14 +5,24 @@ let account;
 let logId = 0;
 let logs = [];
 
-let proposals = [];
-let closeDate;
-let voter;
-let canVote = false;
-let chairPerson;
+let historyId = 0;
+let historyList = [];
 
-const contractAddress = '0xc45BAC75f39094de59C4B7C13e0FC1b1DfF7C3C6';
+let shareList = [];
+let numShare = 0;
+
+// for prevent double emiting purpose
+let emittedEvents = {};
+
+const contractAddress = '0xF7EBe65Aa011E0122ff6457cAcF0ED0D5b67f4aC';
 const ABI = [
+    {
+        "inputs": [],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
     {
         "inputs": [],
         "stateMutability": "nonpayable",
@@ -24,35 +34,34 @@ const ABI = [
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "voter",
+                "name": "sender",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "remain",
+                "type": "uint256"
             }
         ],
-        "name": "GaveRightToVote",
+        "name": "Received",
         "type": "event"
     },
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "voter",
-                "type": "address"
-            }
-        ],
-        "name": "giveRightToVote",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "uint256",
-                "name": "proposal",
+                "name": "amount",
                 "type": "uint256"
             }
         ],
-        "name": "vote",
+        "name": "withdraw",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -69,158 +78,52 @@ const ABI = [
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "proposal",
+                "name": "amount",
                 "type": "uint256"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "voteCount",
+                "name": "remain",
                 "type": "uint256"
             }
         ],
-        "name": "Voted",
+        "name": "Withdrew",
         "type": "event"
     },
     {
         "inputs": [],
-        "name": "chairperson",
+        "name": "numShare",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "shareList",
         "outputs": [
             {
                 "internalType": "address",
                 "name": "",
                 "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "closeDate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "numProposals",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "proposalNames",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "proposals",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "voteCount",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "voters",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "weight",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "voted",
-                "type": "bool"
-            },
-            {
-                "internalType": "uint256",
-                "name": "vote",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "winnerName",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "winnigProposal",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "winningProposal_",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
         "type": "function"
     }
 ]
-
 // onload
 $(() => {
 
@@ -275,115 +178,118 @@ function startApp() {
         });
     }
 
-    getNumProposals().then(async num => {
+    getNumShare().then(async num => {
+
         for (let i = 0; i < +num; i++) {
-            proposals[i] = await getProposals(i);
+            shareList[i] = await getShareList(i);
         }
-        displayProposals();
-        displayStatus();
-    });
 
-    getCloseDate().then(date => {
-        closeDate = new Date(+date * 1000);
-
-        const iv = setInterval(async () => {
-
-            if (new Date().valueOf() < closeDate.valueOf()) {
-                displayDate();
-            } else {
-                canVote = false;
-                displayDate();
-                displayProposals();
-
-                const winner = await getWinnerName();
-
-                $('#winner').html(`The winner is ${winner}`);
-                clearInterval(iv);
-            }
-
-        }, 1000);
-
-    });
-
-    onVoted().on('data', (event) => {
-        const { proposal, voteCount } = event.returnValues;
-        proposals[proposal].voteCount = voteCount;
-        displayProposals();
-    });
-
-    onGaveRightToVote().on('data', () => {
+        displayShareList();
         reloadInfo();
+    });
+
+    web3.eth.getBalance(contractAddress).then(result => {
+        $("#pool-balance").html(`${web3.utils.fromWei(result)} Ether`);
+    });
+
+    contract.getPastEvents('Received', { fromBlock: 0, toBlock: 'latest' }).then(events => {
+        events.forEach(event => {
+            const { sender, amount } = event.returnValues;
+            console.log('event', event);
+            addHistory(`
+                <li>
+                    <a target="_blank" href="${getEtherscanLink(event.transactionHash)}">
+                        Donated ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
+                    </a>
+                </li>
+            `)
+        })
+    });
+
+    contract.getPastEvents('Withdrew', { fromBlock: 0, toBlock: 'latest' }).then(events => {
+        events.forEach(event => {
+            const { sender, amount } = event.returnValues;
+            addHistory(`
+                <li>
+                    <a target="_blank" href="${getEtherscanLink(event.transactionHash)}">
+                        Withdrew ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
+                    </a>
+                </li>
+            `)
+        })
+
+
     })
+
+    onReceived().on('data', event => {
+        const { sender, amount, remain } = event.returnValues;
+        if (!emittedEvents[event.transactionHash]) {
+            addHistory(`
+                <li>
+                    <a target="_blank" href="${getEtherscanLink(event.transactionHash)}">
+                        Donated ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
+                    </a>
+                </li>
+            `);
+            emittedEvents[event.transactionHash] = event;
+        }
+
+        $("#pool-balance").html(`${web3.utils.fromWei(remain)} Ether`);
+    });
+
+    onWithdrew().on('data', event => {
+        const { sender, amount, remain } = event.returnValues;
+        if (!emittedEvents[event.transactionHash]) {
+            addHistory(`
+                <li>
+                    <a target="_blank" href="${getEtherscanLink(event.transactionHash)}">
+                        Withdrew ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
+                    </a>
+                </li>
+            `)
+            emittedEvents[event.transactionHash] = event;
+        }
+
+        $("#pool-balance").html(`${web3.utils.fromWei(remain)} Ether`);
+    })
+
 }
 
 function reloadInfo() {
     displayBalance();
 
-    getVoters(account).then(v => {
-        voter = v;
-        canVote = +voter.weight === 1 && !voter.voted;
-        displayStatus();
-        displayProposals();
-    });
-
-    getChairperson().then(cp => {
-        chairPerson = cp;
-        $('#chairperson-address').html(`(${chairPerson})`);
-
-        if (account.toLowerCase() === chairPerson.toLowerCase()) {
-            $('#managePanel').show();
-        } else {
-            $('#managePanel').hide();
-        }
-    })
-
+    if (shareList.map(share => share.toLowerCase()).includes(account.toLowerCase())) {
+        $('#withdraw-panel').show();
+    } else {
+        $('#withdraw-panel').hide();
+    }
 }
 
 // contract funtions - [getters]
-function getChairperson() {
-    return contract.methods.chairperson().call();
+function getShareList(index) {
+    return contract.methods.shareList(index).call();
 }
 
-function getNumProposals() {
-    return contract.methods.numProposals().call();
-}
-
-function getCloseDate() {
-    return contract.methods.closeDate().call();
-}
-
-function getVoters(address) {
-    return contract.methods.voters(address).call();
-}
-
-function getProposals(index) {
-    return contract.methods.proposals(index).call();
-}
-
-function getWinnigProposal() {
-    return contract.methods.winnigProposal().call();
-}
-
-function getWinnerName() {
-    return contract.methods.winnerName().call();
+function getNumShare() {
+    return contract.methods.numShare().call();
 }
 
 //contract functions - [setters]
-function giveRightToVote(voter) {
-    return contract.methods.giveRightToVote(voter).send({ from: account });
+function withdraw(amount) {
+    return contract.methods.withdraw(amount).send({ from: account });
 }
 
-function vote(proposal) {
-    return contract.methods.vote(proposal).send({ from: account });
+function deposit(value) {
+    return contract.methods.deposit().send({ from: account, value })
 }
 
 //contract events
-function onVoted() {
-    return contract.events.Voted();
+function onReceived() {
+    return contract.events.Received();
 }
 
-function onGaveRightToVote() {
-    return contract.events.GaveRightToVote();
+function onWithdrew() {
+    return contract.events.Withdrew();
 }
 
 //ui functions
@@ -427,13 +333,6 @@ function displayNetwork(netId) {
     else $('#warning-display').hide();
 }
 
-function showPendings() {
-    $('#pending-tx').empty();
-    pendings.forEach(pending => {
-        $('#pending-tx').append(pending.html);
-    })
-}
-
 function addLog(html) {
     const log = { id: logId, html };
     logs.push(log);
@@ -447,64 +346,52 @@ function updateLog(id, html) {
     displayLogs();
 }
 
-async function displayProposals() {
+function displayLogs() {
+    $('#logs').empty();
 
-    $('#proposals').empty();
+    logs.forEach(log => $('#logs').append(log.html));
+}
 
-    proposals.forEach((proposal, index) => {
-        let img = '';
+function addHistory(html) {
+    const history = { id: historyId, html };
+    historyList.push(history);
+    historyId++;
+    displayHistory();
+    return history;
+}
 
-        switch (proposal.name) {
-            case 'John Wick': img = 'john.jpg'; break;
-            case 'Michael Scofield': img = 'michael.png'; break;
-            case 'Dominic toretto': img = 'dominic.jpg'; break;
-        }
+function updateHisory(id, html) {
+    historyList = historyList.map(history => history.id === id ? { id, html } : history);
+    displayHistory();
+}
 
-        $('#proposals').append(`
+function displayHistory() {
+    $('#history').empty();
+
+    historyList.forEach(log => $('#history').append(log.html));
+}
+
+function displayShareList() {
+
+    $('#share-list').empty();
+
+    const images = ['children.jpg', 'hospital.jpg', 'school.jpg'];
+    const names = ['Children', 'Hospital', 'School']
+
+    shareList.forEach((share, index) => {
+
+        $('#share-list').append(`
             <div class="card col-3 mx-1 p-2" style="width: 18rem;">
-                <img src="./assets/${img}" class="card-img-top h-50">
+                <img src="./assets/${images[index]}" class="card-img-top h-50">
                 <div class="card-body text-center">
-                    <p class="card-text">${proposal.name}</p>
-                    <button class='btn btn-primary' ${canVote ? '' : 'disabled'} onclick="handleVote(${index})">${proposal.voteCount} Votes</button>
+                    <h6 class='card-text'>For ${names[index]}</h6>
+                    <p class="card-text">${share}</p>
                 </div>
             </div>
         `);
 
     });
 
-}
-
-function displayDate() {
-    const now = new Date();
-
-    if (now.valueOf() < closeDate.valueOf()) {
-        const diff = closeDate.valueOf() - now.valueOf();
-        const remainHour = Math.floor(diff / 1000 / 60 / 60 % 24);
-        const remainMinute = Math.floor(diff / 1000 / 60 % 60);
-        const remainSecond = Math.floor(diff / 1000 % 60);
-
-        $('#voting-time').html(`Voting will be closed in ${remainHour} : ${remainMinute} : ${remainSecond}`);
-    } else {
-        $('#voting-time').html(`Voting is closed`);
-    }
-
-}
-
-function displayStatus() {
-    const { vote, voted, weight } = voter;
-    if (voted) {
-        $('#status').html(`You've voted ${proposals[+vote] ? proposals[+vote].name : ''}`);
-    } else if (+weight === 0) {
-        $('#status').html(`You have no right to vote please contact a chairperson`);
-    } else if (canVote) {
-        $('#status').html(`Select a proposal to vote`);
-    }
-}
-
-function displayLogs() {
-    $('#logs').empty();
-
-    logs.forEach(log => $('#logs').append(log.html));
 }
 
 // account funcions
@@ -523,41 +410,44 @@ function getEtherscanLink(txHash) {
     return `https://${network}.etherscan.io/tx/${txHash}`;
 }
 
-function strListToHex(strList) {
-    return strList.map(str => web3.utils.fromAscii(str).padEnd(66, "0"))
-}
-
-function hexToAscii(hex) {
-    return web3.utils.toAscii(hex);
-}
-
 // DOM handlers
-function handleGiveRight() {
-    const address = $('#address-input').val();
-
+function donate() {
     let log;
 
-    giveRightToVote(address)
-        .on('transactionHash', () => {
-            log = addLog(`<li>Give right to ${address} (Pending)</li>`)
-        })
-        .on('receipt', (receipt) => {
-            updateLog(log.id, `
-                <li>Give right to ${address} <a target="_blank" href="${getEtherscanLink(receipt.transactionHash)}">${getEtherscanLink(receipt.transactionHash)}</a></li>
-            `)
-        })
+    const val = $('#balance-input').val();
+
+    if (!isNaN(+val)) {
+        deposit(web3.utils.toWei(val, 'ether'))
+            .on('transactionHash', () => {
+                log = addLog(`<li>Donate ${val} ETH (Pending)</li>`)
+            })
+            .on('receipt', receipt => {
+                updateLog(log.id, `
+                    <li>Donate ${val} ETH <a target="_blank" href="${getEtherscanLink(receipt.transactionHash)}">${getEtherscanLink(receipt.transactionHash)}</a></li>
+                `)
+            })
+    } else {
+        alert('Please input number');
+    }
+
 }
 
-function handleVote(proposal) {
+function handleWithdraw() {
     let log;
 
-    vote(proposal)
-        .on('transactionHash', () => {
-            log = addLog(`<li>Vote to ${proposals[proposal].name} (Pending)</li>`)
-        })
-        .on('receipt', (receipt) => {
-            updateLog(log.id, `
-                <li>Vote to ${proposals[proposal].name} <a target="_blank" href="${getEtherscanLink(receipt.transactionHash)}">${getEtherscanLink(receipt.transactionHash)}</a></li>
-            `)
-        })
+    const val = $('#withdraw-input').val();
+
+    if (!isNaN(+val)) {
+        withdraw(web3.utils.toWei(val, 'ether'))
+            .on('transactionHash', () => {
+                log = addLog(`<li>Withdraw ${val} ETH (Pending)</li>`)
+            })
+            .on('receipt', receipt => {
+                updateLog(log.id, `
+                    <li>Withdraw ${val} ETH <a target="_blank" href="${getEtherscanLink(receipt.transactionHash)}">${getEtherscanLink(receipt.transactionHash)}</a></li>
+                `)
+            })
+    } else {
+        alert('Please input number');
+    }
 }
