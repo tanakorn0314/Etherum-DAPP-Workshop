@@ -10,7 +10,7 @@ let number = 5;
 let bool = true;
 let account = '';
 
-const contractAddress = '0x4d2c1748897324d64B37A24Cee2B7C150d0b0F0D';
+const contractAddress = '0x96512Ea07b29bBF929F88Bf93AAc95c509905b29';
 const ABI = [
     {
         "inputs": [],
@@ -250,8 +250,7 @@ function displayNetwork(netId) {
             network = 'Kovan';
             break
         default:
-            network = 'Unknown';
-            warning = 'Please switch your network to Kovan';
+            network = netId;
     }
     $('#network-display').html(`Network: ${network}`);
     if (warning) {
