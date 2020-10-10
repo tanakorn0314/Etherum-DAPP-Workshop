@@ -31,7 +31,7 @@ contract Ballot {
         chairperson = msg.sender;
         numProposals = proposalNames.length;
         
-        closeDate = block.timestamp + 30 minutes;
+        closeDate = block.timestamp + 1 hours;
         
         for (uint i = 0; i < proposalNames.length; i++) {
             proposals.push(

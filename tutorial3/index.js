@@ -14,115 +14,115 @@ let numShare = 0;
 // for prevent double emiting purpose
 let emittedEvents = {};
 
-const contractAddress = '0xF7EBe65Aa011E0122ff6457cAcF0ED0D5b67f4aC';
+const contractAddress = '0xDb68Bff92D959680c1CFb10e8331e7Ceb075a640';
 const ABI = [
-    {
-        "inputs": [],
-        "name": "deposit",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "remain",
-                "type": "uint256"
-            }
-        ],
-        "name": "Received",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "withdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "remain",
-                "type": "uint256"
-            }
-        ],
-        "name": "Withdrew",
-        "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "numShare",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "shareList",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    }
+	{
+		"inputs": [],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "remain",
+				"type": "uint256"
+			}
+		],
+		"name": "Received",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "remain",
+				"type": "uint256"
+			}
+		],
+		"name": "Withdrew",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "numShare",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "shareList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
 ]
 // onload
 $(() => {
@@ -212,7 +212,7 @@ function startApp() {
             addHistory(`
                 <li>
                     <a target="_blank" href="${getEtherscanLink(event.transactionHash)}">
-                        Withdrew ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
+                        Withdrawn ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
                     </a>
                 </li>
             `)
@@ -243,7 +243,7 @@ function startApp() {
             addHistory(`
                 <li>
                     <a target="_blank" href="${getEtherscanLink(event.transactionHash)}">
-                        Withdrew ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
+                        Withdrawn ${web3.utils.fromWei(amount, 'ether')} ETH by ${sender}
                     </a>
                 </li>
             `)
