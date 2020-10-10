@@ -1,5 +1,6 @@
 pragma solidity >0.6.99 <0.8.0;
 
+
 contract Ballot {
     
     struct Voter {
@@ -9,7 +10,7 @@ contract Ballot {
     }
     
     struct Proposal {
-        bytes32 name;
+        string name;
         uint voteCount;
     }
     
@@ -17,9 +18,20 @@ contract Ballot {
     
     mapping(address => Voter) public voters;
     Proposal[] public proposals;
+
+    string[] public proposalNames = ["John Wick", "Michael Scofield", "Dominic toretto"];
+    uint public numProposals;
     
-    constructor(bytes32[] memory proposalNames) {
+    uint public closeDate;
+    
+    event Voted(address sender, uint proposal, uint voteCount);
+    event GaveRightToVote(address voter);
+    
+    constructor() {
         chairperson = msg.sender;
+        numProposals = proposalNames.length;
+        
+        closeDate = block.timestamp + 30 minutes;
         
         for (uint i = 0; i < proposalNames.length; i++) {
             proposals.push(
@@ -33,16 +45,22 @@ contract Ballot {
         require(!voters[voter].voted, "The voter already voted");
         require(voters[voter].weight == 0);
         voters[voter].weight = 1;
+        
+        emit GaveRightToVote(voter);
     }
     
     function vote(uint proposal) public {
         Voter storage sender = voters[msg.sender];
         require(sender.weight != 0, "Has no right to vote");
-        require(!sender.voted, "Alreadt voted");
+        require(!sender.voted, "Already voted");
+        require(block.timestamp < closeDate, "The voting is closed");
+        
         sender.voted = true;
         sender.vote = proposal;
         
         proposals[proposal].voteCount++;
+        
+        emit Voted(msg.sender, proposal, proposals[proposal].voteCount);
     }
     
     function winnigProposal() public view returns (uint winningProposal_) {
@@ -55,10 +73,8 @@ contract Ballot {
         }
     }
     
-    function winnerName() public view returns (bytes32) {
+    function winnerName() public view returns (string memory) {
         return proposals[winnigProposal()].name;
     }
-    
-    
     
 }
