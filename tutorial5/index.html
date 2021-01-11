@@ -30,8 +30,7 @@
 <body>
     <div class='container py-3'>
         <div class='d-flex justify-content-between'>
-            <a href='/tutorial3/'>&lt;&lt; Tutorial 3</a>
-            <a href='/tutorial5/'>Tutorial 5 >></a>
+            <a href='/tutorial4/'>&lt;&lt; Tutorial 4</a>
         </div>
 
         <div class='my-3'>
@@ -43,34 +42,18 @@
 
         <hr />
 
-        <h1>Voting Example</h1>
+        <h1>ERC20 (Token) Example</h1>
 
         <div class='mb-3'>
-            <p id='status'></p>
-            <div id='proposals' class='row mb-2'></div>
-            <p id='voting-time'></p>
-            <p id='winner'></p>
+            <h3 id='token-name'></h3>
+            <p id='total-supply'></p>
+            <p id='balance-of'></p>
         </div>
 
-
-        <hr />
-
-        <h4>Manage Panel</h4>
-
-        <p>Chair person <span id='chairperson-address'></span></p>
-
-        <div id='managePanel'>
-            <div class='d-flex w-50'>
-                <input id='address-input' class='form-control mr-1' placeholder="User address" />
-                <button class='btn btn-primary' onclick="handleGiveRight()">Approve</button>
-            </div>
-        </div>
-
-        <hr />
-
-        <div class='mb-3'>
-            <h4>Logs</h4>
-            <ul id='logs'></ul>
+        <div class='d-flex w-50'>
+            <input id='address-input' class='form-control mr-1' placeholder="Address (0xabcde...)" />
+            <input id='amount-input' class='form-control mr-1' type='number' placeholder="amount" />
+            <button class='btn btn-primary' onclick="handleTransfer()">Transfer</button>
         </div>
 
     </div>
